@@ -1,0 +1,48 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Gameplay/GameplayView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "GOAL",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 240
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 325
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 357
+        }
+      },
+      {
+        "comment": "",
+        "key": "RUN PROGRESS",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 370
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 375
+        }
+      }
+    ]
+  },
+  "version": 1
+}

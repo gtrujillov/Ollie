@@ -1,0 +1,72 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Shop/ShopView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "shop",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 30
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "ACTIVE",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 196
+        }
+      },
+      {
+        "comment": "",
+        "key": "EQUIPPED",
+        "location": {
+          "startingColumn": 96,
+          "startingLine": 196
+        }
+      },
+      {
+        "comment": "",
+        "key": "ENABLE",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "SELECT",
+        "location": {
+          "startingColumn": 96,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 223
+        }
+      }
+    ]
+  },
+  "version": 1
+}

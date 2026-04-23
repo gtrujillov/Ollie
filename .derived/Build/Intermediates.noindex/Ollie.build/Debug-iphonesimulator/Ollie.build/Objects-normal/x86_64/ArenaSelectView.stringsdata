@@ -1,0 +1,24 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Arena/ArenaSelectView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "ARENAS",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "PLAY",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 97
+        }
+      }
+    ]
+  },
+  "version": 1
+}

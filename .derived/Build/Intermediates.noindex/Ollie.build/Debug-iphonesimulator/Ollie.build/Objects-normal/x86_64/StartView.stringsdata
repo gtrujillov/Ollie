@@ -1,0 +1,56 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Start/StartView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 73
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ollie",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "WARRIOR",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "PLAY",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "ARENAS",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "SHOP",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 194
+        }
+      }
+    ]
+  },
+  "version": 1
+}

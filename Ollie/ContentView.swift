@@ -4,31 +4,51 @@ struct ContentView: View {
     @StateObject private var gameVM = GameViewModel()
     @State private var screen: AppScreen = .start
     @State private var shopReturnScreen: AppScreen = .start
-    @AppStorage("ollie-tutorial-v1") private var tutorialSeen = false
 
     var body: some View {
         ZStack {
             switch screen {
             case .start:
                 StartView(
+                    viewModel:     gameVM,
+                    onPlay:        { gameVM.loadArena(gameVM.highestArena); screen = .gameplay },
+                    onArenaSelect: { screen = .arenaSelect },
+                    onShop:        { shopReturnScreen = .start; screen = .shop }
+                )
+                .transition(.opacity)
+
+            case .arenaSelect:
+                ArenaSelectView(
                     viewModel: gameVM,
-                    onPlay: { screen = .gameplay },
-                    onShop: { shopReturnScreen = .start; screen = .shop }
+                    onPlay:    { id in gameVM.loadArena(id); screen = .gameplay },
+                    onBack:    { screen = .start }
                 )
                 .transition(.opacity)
 
             case .gameplay:
-                GameplayView(viewModel: gameVM) {
-                    screen = .gameOver
-                }
+                GameplayView(
+                    viewModel:       gameVM,
+                    onLevelComplete: { screen = .levelComplete },
+                    onGameOver:      { screen = .gameOver }
+                )
+                .transition(.opacity)
+
+            case .levelComplete:
+                LevelCompleteView(
+                    viewModel: gameVM,
+                    onNext:    { gameVM.loadArena(gameVM.arenaId + 1); screen = .gameplay },
+                    onArenas:  { screen = .arenaSelect },
+                    onHome:    { screen = .start }
+                )
                 .transition(.opacity)
 
             case .gameOver:
                 GameOverView(
                     viewModel: gameVM,
-                    onReplay: { gameVM.prepareForReplay(); screen = .gameplay },
-                    onHome:   { gameVM.prepareForReplay(); screen = .start },
-                    onShop:   { shopReturnScreen = .gameOver; screen = .shop }
+                    onRetry:   { gameVM.loadArena(gameVM.arenaId); screen = .gameplay },
+                    onArenas:  { screen = .arenaSelect },
+                    onHome:    { screen = .start },
+                    onShop:    { shopReturnScreen = .gameOver; screen = .shop }
                 )
                 .transition(.opacity)
 
@@ -42,15 +62,11 @@ struct ContentView: View {
         }
         .animation(.easeInOut(duration: 0.22), value: screen)
         .ignoresSafeArea()
-        .fullScreenCover(isPresented: .init(
-            get: { !tutorialSeen },
-            set: { if !$0 { tutorialSeen = true } }
-        )) {
-            TutorialView { tutorialSeen = true }
-        }
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

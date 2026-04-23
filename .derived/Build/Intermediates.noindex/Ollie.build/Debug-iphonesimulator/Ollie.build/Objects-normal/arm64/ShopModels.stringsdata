@@ -1,0 +1,328 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Domain/Models/ShopModels.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Classic",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "The original.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "Minty",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fresh & cool.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dreamy",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "Soft lavender.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coral",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Warm & vibrant.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Goldie",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pure gold.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "Shadow",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Into the dark.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Parchment",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Classic cream.",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sky",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear blue sky.",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Garden",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Lush green.",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sunset",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "Warm glow.",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "Midnight",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Deep space.",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Classic",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Standard ink.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Forest",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Deep forest green.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Navy",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Oceanic blue.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Crimson",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Blood red.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gilt",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Golden lashes.",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Iron Eyelid",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start each run shielded.",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rookie Shield",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Shield absorbs 2 hits.",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coin Magnet",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wider coin pickup radius.",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Daredevil",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bigger close-call zone.",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 68
+        }
+      }
+    ]
+  },
+  "version": 1
+}

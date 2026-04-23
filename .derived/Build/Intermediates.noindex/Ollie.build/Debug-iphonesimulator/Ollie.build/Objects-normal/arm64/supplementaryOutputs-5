@@ -1,0 +1,23 @@
+{
+  "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Domain/Repositories/ShopRepositoryProtocol.swift" : {
+    "const-values" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopRepositoryProtocol.swiftconstvalues",
+    "dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopRepositoryProtocol.d",
+    "diagnostics" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopRepositoryProtocol.dia",
+    "object" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopRepositoryProtocol.o",
+    "swift-dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopRepositoryProtocol.swiftdeps"
+  },
+  "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Domain/UseCases/GameUseCase.swift" : {
+    "const-values" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/GameUseCase.swiftconstvalues",
+    "dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/GameUseCase.d",
+    "diagnostics" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/GameUseCase.dia",
+    "object" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/GameUseCase.o",
+    "swift-dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/GameUseCase.swiftdeps"
+  },
+  "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Domain/UseCases/ShopUseCase.swift" : {
+    "const-values" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopUseCase.swiftconstvalues",
+    "dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopUseCase.d",
+    "diagnostics" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopUseCase.dia",
+    "object" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopUseCase.o",
+    "swift-dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/arm64/ShopUseCase.swiftdeps"
+  }
+}

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>%d close calls</key>
+	<string>%d sustos</string>
+	<key>ACTIVE</key>
+	<string>ACTIVO</string>
+	<key>BEAM</key>
+	<string>RAYO</string>
+	<key>BEST</key>
+	<string>RÉCORD</string>
+	<key>BG</key>
+	<string>FONDO</string>
+	<key>BLINK</key>
+	<string>PARPADEA</string>
+	<key>Bigger close-call zone.</key>
+	<string>Zona de susto más amplia.</string>
+	<key>Blood red.</key>
+	<string>Rojo sangre.</string>
+	<key>CLOSE CALL +BLINK</key>
+	<string>¡POR LOS PELOS! +PARPADEA</string>
+	<key>COINS</key>
+	<string>MONEDAS</string>
+	<key>COINS EARNED</key>
+	<string>MONEDAS GANADAS</string>
+	<key>Classic</key>
+	<string>Clásico</string>
+	<key>Classic cream.</key>
+	<string>Crema clásica.</string>
+	<key>Clear blue sky.</key>
+	<string>Cielo azul.</string>
+	<key>Coin Magnet</key>
+	<string>Imán de Monedas</string>
+	<key>Collect %d coins</key>
+	<string>Recoge %d monedas</string>
+	<key>Combo of %d</key>
+	<string>Combo de %d</string>
+	<key>Crimson</key>
+	<string>Carmesí</string>
+	<key>DAILY</key>
+	<string>DIARIO</string>
+	<key>DAILY LASH · SHARED SEED</key>
+	<string>LÁTIGO DIARIO · SEMILLA COMPARTIDA</string>
+	<key>Daredevil</key>
+	<string>Temerario</string>
+	<key>Deep forest green.</key>
+	<string>Verde bosque profundo.</string>
+	<key>Deep space.</key>
+	<string>Espacio profundo.</string>
+	<key>Dreamy</key>
+	<string>Soñador</string>
+	<key>ENABLE</key>
+	<string>ACTIVAR</string>
+	<key>EQUIPPED</key>
+	<string>EQUIPADO</string>
+	<key>EYE BEAM!</key>
+	<string>¡RAYO VISUAL!</string>
+	<key>Each run gives you 3 missions. Complete them to earn bonus coins and unlock the shop.</key>
+	<string>Cada partida tiene 3 misiones. Complétalas para ganar monedas extra.</string>
+	<key>FLAP TO START</key>
+	<string>ALETEA PARA EMPEZAR</string>
+	<key>FRIENDS TODAY</key>
+	<string>AMIGOS HOY</string>
+	<key>Fire beam %d×</key>
+	<string>Dispara rayo %d×</string>
+	<key>Forest</key>
+	<string>Bosque</string>
+	<key>Fresh &amp; cool.</key>
+	<string>Fresco y genial.</string>
+	<key>GOT IT</key>
+	<string>ENTENDIDO</string>
+	<key>Garden</key>
+	<string>Jardín</string>
+	<key>Gilt</key>
+	<string>Dorado</string>
+	<key>Golden lashes.</key>
+	<string>Látigos dorados.</string>
+	<key>Goldie</key>
+	<string>Dorado</string>
+	<key>HOLD</key>
+	<string>SUJETA</string>
+	<key>HOME</key>
+	<string>INICIO</string>
+	<key>Into the dark.</key>
+	<string>Hacia la oscuridad.</string>
+	<key>Iron Eyelid</key>
+	<string>Párpado de Hierro</string>
+	<key>LASH</key>
+	<string>LÁTIGO</string>
+	<key>Lush green.</key>
+	<string>Verde exuberante.</string>
+	<key>MISSION +%lld</key>
+	<string>MISIÓN +%lld</string>
+	<key>MISSIONS</key>
+	<string>MISIONES</string>
+	<key>Midnight</key>
+	<string>Medianoche</string>
+	<key>Minty</key>
+	<string>Menta</string>
+	<key>NEXT</key>
+	<string>SIGUIENTE</string>
+	<key>Navy</key>
+	<string>Marino</string>
+	<key>Oceanic blue.</key>
+	<string>Azul oceánico.</string>
+	<key>POWER</key>
+	<string>PODER</string>
+	<key>Parchment</key>
+	<string>Pergamino</string>
+	<key>Pure gold.</key>
+	<string>Oro puro.</string>
+	<key>RANKS</key>
+	<string>RANKING</string>
+	<key>Reach score %d</key>
+	<string>Alcanza %d puntos</string>
+	<key>Rookie Shield</key>
+	<string>Escudo Novel</string>
+	<key>SCORE</key>
+	<string>PUNTUACIÓN</string>
+	<key>SELECT</key>
+	<string>ELEGIR</string>
+	<key>SHARE</key>
+	<string>COMPARTIR</string>
+	<key>SHIELD BREAK</key>
+	<string>ESCUDO ROTO</string>
+	<key>SHIELD HIT</key>
+	<string>GOLPE ESCUDO</string>
+	<key>SHIELD!</key>
+	<string>¡ESCUDO!</string>
+	<key>SHOP</key>
+	<string>TIENDA</string>
+	<key>SMASH! +%lld</key>
+	<string>¡DESTRUIDO! +%lld</string>
+	<key>SPEED UP!</key>
+	<string>¡MÁS RÁPIDO!</string>
+	<key>Shadow</key>
+	<string>Sombra</string>
+	<key>Shield absorbs 2 hits.</key>
+	<string>El escudo absorbe 2 golpes.</string>
+	<key>Sky</key>
+	<string>Cielo</string>
+	<key>Soft lavender.</key>
+	<string>Lavanda suave.</string>
+	<key>Standard ink.</key>
+	<string>Tinta estándar.</string>
+	<key>Start each run shielded.</key>
+	<string>Empieza con escudo.</string>
+	<key>Sunset</key>
+	<string>Atardecer</string>
+	<key>Survive %ds</key>
+	<string>Sobrevive %ds</string>
+	<key>TAP &amp; HOLD</key>
+	<string>TOCA Y SUJETA</string>
+	<key>TAP TO FLY AGAIN</key>
+	<string>TOCA PARA VOLAR DE NUEVO</string>
+	<key>TAP · HOLD · BLINK</key>
+	<string>TOCA · SUJETA · PARPADEA</string>
+	<key>Tap anywhere on the left to flap. Hold to BLINK — time slows and Ollie glows.</key>
+	<string>Toca la izquierda para aletear. Mantén pulsado para PARPADEAR — el tiempo se ralentiza.</string>
+	<key>The original.</key>
+	<string>El original.</string>
+	<key>Wait for the ⚡ charge to fill, then tap the right side to unleash a beam that blasts obstacles.</key>
+	<string>Espera a que ⚡ se recargue y toca la derecha para disparar el rayo ocular.</string>
+	<key>Warm &amp; vibrant.</key>
+	<string>Cálido y vibrante.</string>
+	<key>Warm glow.</key>
+	<string>Resplandor cálido.</string>
+	<key>Wider coin pickup radius.</key>
+	<string>Mayor radio de recogida.</string>
+	<key>game over.</key>
+	<string>fin del juego.</string>
+	<key>hold → BLINK  ·  double-tap → EYE BEAM ⚡</key>
+	<string>sujeta → PARPADEA  ·  doble toque → RAYO ⚡</string>
+	<key>hold → BLINK  ·  right side → EYE BEAM ⚡</key>
+	<string>sujeta → PARPADEA  ·  derecha → RAYO ⚡</string>
+	<key>ollie got eaten</key>
+	<string>ollie fue devorado</string>
+	<key>shop</key>
+	<string>tienda</string>
+	<key>tap to fly</key>
+	<string>toca para volar</string>
+	<key>you</key>
+	<string>tú</string>
+	<key>×%lld  ·  %lld COMBO</key>
+	<string>×%lld  ·  %lld COMBO</string>
+	<key>★  new personal best  ★</key>
+	<string>★  nuevo récord personal  ★</string>
+</dict>
+</plist>

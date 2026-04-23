@@ -1,0 +1,23 @@
+{
+  "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Arena/LevelCompleteView.swift" : {
+    "const-values" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/LevelCompleteView.swiftconstvalues",
+    "dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/LevelCompleteView.d",
+    "diagnostics" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/LevelCompleteView.dia",
+    "object" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/LevelCompleteView.o",
+    "swift-dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/LevelCompleteView.swiftdeps"
+  },
+  "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/GameOver/GameOverView.swift" : {
+    "const-values" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/GameOverView.swiftconstvalues",
+    "dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/GameOverView.d",
+    "diagnostics" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/GameOverView.dia",
+    "object" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/GameOverView.o",
+    "swift-dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/GameOverView.swiftdeps"
+  },
+  "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Gameplay/Components/CoinView.swift" : {
+    "const-values" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/CoinView.swiftconstvalues",
+    "dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/CoinView.d",
+    "diagnostics" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/CoinView.dia",
+    "object" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/CoinView.o",
+    "swift-dependencies" : "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/.derived/Build/Intermediates.noindex/Ollie.build/Debug-iphonesimulator/Ollie.build/Objects-normal/x86_64/CoinView.swiftdeps"
+  }
+}

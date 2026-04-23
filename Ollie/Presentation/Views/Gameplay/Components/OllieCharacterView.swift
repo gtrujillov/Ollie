@@ -131,9 +131,11 @@ struct OllieCharacterView: View {
     }
 }
 
-#Preview {
-    ZStack {
-        Color.ollie_cream.ignoresSafeArea()
-        OllieCharacterView(size: 100, wingPhase: 0)
+struct OllieCharacterView_Previews: PreviewProvider {
+    static var previews: some View {
+        ZStack {
+            Color.ollie_cream.ignoresSafeArea()
+            OllieCharacterView(size: 100, wingPhase: 0)
+        }
     }
 }

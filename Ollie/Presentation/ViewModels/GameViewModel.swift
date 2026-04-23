@@ -6,141 +6,132 @@ final class GameViewModel: ObservableObject {
 
     // MARK: - Published state
 
-    @Published var phase:        GamePhase       = .idle
-    @Published var ollie         = OlliePhysics()
-    @Published var obstacles:    [ObstacleModel] = []
-    @Published var pickups:      [PickupModel]   = []
-    @Published var popups:       [PopupModel]    = []
-    @Published var rings:        [RingModel]     = []
-    @Published var score         = GameScore()
-    @Published var blinkMeter:   CGFloat = 1.0
-    @Published var isBlinking    = false
-    @Published var flashActive   = false
-    @Published var combo         = 0
-    @Published var shielded      = false
-    @Published var dangerLevel:  CGFloat = 0
-    @Published var speedTier:    Int     = 0
-    @Published var projectiles:  [ProjectileModel] = []
-    @Published var beamCharge:   CGFloat = 0
-    @Published var streak:       Int             = 0
+    @Published var phase:       GamePhase = .idle
+    @Published var player       = PlayerState()
+    @Published var platforms:   [PlatformModel] = []
+    @Published var groundSegs:  [GroundSegment] = []
+    @Published var enemies:     [EnemyModel]    = []
+    @Published var fireballs:   [FireballModel] = []
+    @Published var pickups:     [PickupModel]   = []
+    @Published var rings:       [RingModel]     = []
+    @Published var hearts:      Int             = 3
+    @Published var score:       GameScore       = GameScore()
+    @Published var cameraX:     CGFloat         = 0
+    @Published var arenaId:     Int             = 1
+    @Published var finishX:     CGFloat         = 3500
+    @Published var levelWidth:  CGFloat         = 3600
+    @Published var highestArena: Int            = 1
+    @Published var flashActive: Bool            = false
+    @Published var shieldCharges: Int           = 0
+    @Published var bannerText: String?          = nil
+    @Published var bannerAccent: Color          = .ollie_coral
+    @Published var tutorialEnabled: Bool        = true
 
     // MARK: - Dependencies
 
-    let world:     GameWorld
-    private let useCase:       GameUseCase
-    private let scoreRepo:     ScoreRepositoryProtocol
-    private let shopRepo:      ShopRepositoryProtocol
-    private let shopCase =     ShopUseCase()
-    @Published var inventory:  PlayerInventory = PlayerInventory()
+    let world:      GameWorld
+    private let useCase:    GameUseCase
+    private let scoreRepo:  ScoreRepositoryProtocol
+    private let shopRepo:   ShopRepositoryProtocol
+    private let shopCase =  ShopUseCase()
+    @Published var inventory: PlayerInventory = PlayerInventory()
 
-    // MARK: - Private loop state
+    // MARK: - Private state
 
-    private var loopDriver:        DisplayLinkDriver?
-    private var lastTS:            CFTimeInterval = 0
-    private var spawnTimer:        Double         = 1.0
-    private var pendingDoubleSecs: Double         = 0
-    private var spawnCount:        Int            = 0
-    private var isHolding          = false
-    private var shieldHitsLeft:    Int            = 1
+    private var loopDriver:  DisplayLinkDriver?
+    private var lastTS:      CFTimeInterval = 0
+    private var checkpoints: [CGFloat]      = []
+    private var passedCheckpoints = Set<CGFloat>()
 
     // MARK: - Init
 
     init(
-        world:      GameWorld               = GameWorld(),
-        difficulty: CGFloat                 = 1.0,
-        scoreRepo:  ScoreRepositoryProtocol = UserDefaultsScoreRepository(),
-        shopRepo:   ShopRepositoryProtocol  = UserDefaultsShopRepository()
+        world:     GameWorld               = GameWorld(),
+        scoreRepo: ScoreRepositoryProtocol = UserDefaultsScoreRepository(),
+        shopRepo:  ShopRepositoryProtocol  = UserDefaultsShopRepository()
     ) {
         self.world     = world
-        self.useCase   = GameUseCase(world: world, difficulty: difficulty)
+        self.useCase   = GameUseCase(world: world)
         self.scoreRepo = scoreRepo
         self.shopRepo  = shopRepo
-        score.best     = scoreRepo.getBestScore()
+        highestArena   = scoreRepo.getHighestArenaUnlocked()
         score.coins    = scoreRepo.getCoins()
-        streak         = scoreRepo.getStreak()
-        self.inventory = shopRepo.getInventory()
+        inventory      = shopRepo.getInventory()
     }
 
-    // MARK: - Computed helpers
-
-    var absY: CGFloat { world.centerY + ollie.y }
-
-    var scoreMultiplier: Int {
-        if combo >= 6 { return 3 }
-        if combo >= 3 { return 2 }
-        return 1
-    }
+    // MARK: - Computed
 
     var selectedOllieColor:      Color { shopCase.ollieColor(for: inventory) }
-    var selectedBackgroundColor: Color { shopCase.backgroundColor(for: inventory) }
-    var selectedLashColor:       Color { shopCase.lashColor(for: inventory) }
+    var selectedBackgroundColor: Color {
+        ArenaRegistry.definition(id: arenaId)?.bgColor ?? Color.ollie_cream
+    }
+    var selectedLashColor: Color { shopCase.lashColor(for: inventory) }
+    var currentArena: ArenaDefinition { ArenaRegistry.arena(id: arenaId) }
 
-    var beamReady: Bool { beamCharge >= 1.0 && projectiles.isEmpty }
-
-    private var startsWithShield: Bool { inventory.activeUpgrades.contains("pw_iron") }
-    private var shieldMaxHits:    Int  { inventory.activeUpgrades.contains("pw_rookie") ? 2 : 1 }
-    private var hasCoinMagnet:    Bool { inventory.activeUpgrades.contains("pw_magnet") }
-    private var hasDaredevil:     Bool { inventory.activeUpgrades.contains("pw_daredevil") }
+    // MARK: - Public API
 
     func refreshInventory() {
         inventory   = shopRepo.getInventory()
         score.coins = scoreRepo.getCoins()
-        streak      = scoreRepo.getStreak()
+        highestArena = scoreRepo.getHighestArenaUnlocked()
+        shieldCharges = startingShieldCharges()
     }
 
-    // MARK: - Public interface
+    func loadArena(_ id: Int) {
+        arenaId = id
+        let levelData  = LevelDefinitions.level(forArena: id)
+        groundSegs     = levelData.groundSegs
+        platforms      = levelData.platforms
+        enemies        = levelData.enemies
+        pickups        = levelData.pickups
+        checkpoints    = levelData.checkpoints
+        finishX        = levelData.finishX
+        levelWidth     = levelData.levelWidth
+        hearts         = 3
+        score.coinsEarned = 0
+        fireballs      = []
+        rings          = []
+        cameraX        = 0
+        flashActive    = false
+        shieldCharges  = startingShieldCharges()
+        passedCheckpoints = []
+        tutorialEnabled = id == 1
 
-    func onTap() {
-        guard phase != .dead else { return }
-        if phase == .idle {
-            phase = .playing
-            doFlap()
-            return
-        }
-        doFlap()
+        let startScreenY = world.groundY - world.charSize * 0.5
+        player = PlayerState(
+            worldX:          300,
+            screenY:         startScreenY,
+            checkpointWorldX: 300,
+            checkpointScreenY: startScreenY,
+            extraJumpsRemaining: 1
+        )
+        showBanner("\(currentArena.name) • \(currentArena.description)", accent: currentArena.accentColor, duration: 2.0)
+        phase = .idle
     }
 
-    func onBeamTap() {
-        guard phase == .playing && beamReady else { return }
-        fireBeam()
+    func startPlay() {
+        guard phase == .idle else { return }
+        phase = .playing
+        tutorialEnabled = false
     }
 
-    func holdBegan() { isHolding = true  }
-    func holdEnded() { isHolding = false }
+    func onJump() {
+        guard phase == .playing else { return }
+        player = useCase.jump(player)
+    }
+
+    func onAttack() {
+        guard phase == .playing else { return }
+        player = useCase.attack(player)
+        if player.isAttacking { spawnRingAt(player.screenY) }
+    }
 
     func startLoop() {
-        lastTS     = 0
-        spawnTimer = 1.0
+        lastTS = 0
         loopDriver = DisplayLinkDriver { [weak self] ts in self?.tick(ts) }
     }
 
     func stopLoop() { loopDriver = nil }
-
-    func prepareForReplay() {
-        refreshInventory()
-        phase      = .idle
-        ollie      = OlliePhysics()
-        obstacles  = []
-        pickups    = []
-        popups     = []
-        rings      = []
-        score.current     = 0
-        score.coinsEarned = 0
-        combo      = 0
-        blinkMeter = 1.0
-        isBlinking = false
-        shielded   = startsWithShield
-        shieldHitsLeft = shieldMaxHits
-        dangerLevel = 0
-        speedTier  = 0
-        isHolding  = false
-        spawnTimer = 1.0
-        spawnCount = 0
-        pendingDoubleSecs = 0
-        lastTS      = 0
-        projectiles = []
-        beamCharge  = 0
-    }
 
     // MARK: - Game loop
 
@@ -150,243 +141,173 @@ final class GameViewModel: ObservableObject {
         lastTS = ts
 
         switch phase {
-        case .dead:    break
-        case .idle:    animateIdle(t: ts, dt: dt)
-        case .playing: simulateStep(dt: dt)
+        case .idle:    idleTick(dt: dt)
+        case .playing: simulateTick(dt: dt)
+        default:       break
         }
     }
 
-    private func animateIdle(t: CFTimeInterval, dt: CGFloat) {
-        ollie.y         = sin(t / 0.4) * 18 * world.height / 874
-        ollie.rotation  = sin(t / 0.4) * 6
-        ollie.wingPhase += dt * 8
+    private func idleTick(dt: CGFloat) {
+        // Gentle bob while idle (waiting to start)
+        player.screenY = world.groundY - world.charSize * 0.5 + sin(lastTS) * 4
+        player.runPhase += dt * 6
     }
 
-    private func simulateStep(dt: CGFloat) {
-        // ── Blink ──────────────────────────────────────────────────
-        let canBlink = isHolding && blinkMeter > 0.02
-        isBlinking = canBlink
-        blinkMeter = canBlink
-            ? max(0,  blinkMeter - dt * useCase.blinkDrainRate)
-            : min(1,  blinkMeter + dt * useCase.blinkRechargeRate)
+    private func simulateTick(dt: CGFloat) {
+        // ── Physics ──────────────────────────────────────────────────
+        var p = useCase.applyGravity(to: player, dt: dt)
 
-        let timeScale: CGFloat = isBlinking ? useCase.blinkTimeScale : 1.0
-        let sdt = dt * timeScale
+        // Update camera
+        cameraX = max(0, min(p.worldX - world.charScreenX, levelWidth - world.width))
 
-        // ── Beam charge (real-time, unaffected by blink slow-mo) ──
-        if beamCharge < 1.0 {
-            beamCharge = min(1.0, beamCharge + dt * useCase.beamChargeRate)
+        // Ground & platform collision
+        p = useCase.resolveGround(player: p, groundSegs: groundSegs)
+        p = useCase.resolvePlatforms(player: p, platforms: platforms)
+        p = useCase.consumeBufferedJumpIfPossible(p)
+
+        // ── Fell off ─────────────────────────────────────────────────
+        if useCase.playerFellOff(player: p) {
+            takeDamage(player: &p, respawn: true)
         }
 
-        // ── Progressive speed ──────────────────────────────────────
-        let speedMul = useCase.speedMultiplier(score: score.current)
-        let moveSdt  = sdt * speedMul
-        let newTier  = Int((speedMul - 1.0) / 0.07)
-        if newTier > speedTier {
-            speedTier = newTier
-            addPopup(String(localized: "SPEED UP!"), x: world.charX, y: absY - 50, kind: .speedUp)
+        // ── Checkpoint ───────────────────────────────────────────────
+        if let newCP = useCase.checkpointPassed(player: p, checkpoints: checkpoints) {
+            p.checkpointWorldX  = newCP
+            p.checkpointScreenY = world.groundY - world.charSize * 0.5
+            if !passedCheckpoints.contains(newCP) {
+                passedCheckpoints.insert(newCP)
+                showBanner("Checkpoint secured", accent: currentArena.accentColor)
+            }
         }
 
-        // ── Physics ────────────────────────────────────────────────
-        ollie = useCase.applyPhysics(ollie, dt: dt, timeScale: timeScale)
-        let y = absY
+        // ── Moving platforms ─────────────────────────────────────────
+        platforms = useCase.updateMovingPlatforms(platforms, dt: dt)
 
-        if useCase.isOutOfBounds(absY: y) { die(); return }
+        // ── Enemies ──────────────────────────────────────────────────
+        enemies = useCase.updateEnemies(enemies, dt: dt)
+        enemies.removeAll { $0.isDead && $0.deathTimer > 0.6 }
 
-        // ── Oscillating obstacles ──────────────────────────────────
-        var newObs = useCase.updateOscillation(
-            useCase.moveObstacles(obstacles, sdt: moveSdt),
-            sdt: sdt
+        let newFireballs = useCase.spawnFireballs(from: enemies)
+        enemies = useCase.consumeFireballTimers(enemies)
+        fireballs.append(contentsOf: newFireballs)
+        fireballs = useCase.moveFireballs(fireballs, dt: dt, cameraX: cameraX)
+
+        // ── Sword hits ───────────────────────────────────────────────
+        let killed = useCase.enemiesKilledBySword(player: p, enemies: enemies)
+        if !killed.isEmpty {
+            for i in enemies.indices where killed.contains(enemies[i].id) {
+                enemies[i].isDead = true
+                spawnRingAt(world.screenY(norm: enemies[i].normY))
+            }
+            score.coinsEarned += killed.count
+        }
+
+        let deflected = useCase.fireballsDeflectedBySword(player: p, fireballs: fireballs)
+        fireballs.removeAll { deflected.contains($0.id) }
+
+        // ── Damage from enemies ──────────────────────────────────────
+        if useCase.playerHitByEnemy(player: p, enemies: enemies) {
+            takeDamage(player: &p, respawn: false)
+        } else if useCase.playerHitByFireball(player: p, fireballs: fireballs) {
+            fireballs.removeAll { useCase.playerHitByFireball(player: p, fireballs: [$0]) }
+            takeDamage(player: &p, respawn: false)
+        }
+
+        // ── Pickups ──────────────────────────────────────────────────
+        let collected = useCase.collectPickups(
+            player: p,
+            pickups: pickups,
+            radiusMultiplier: inventory.activeUpgrades.contains("pw_magnet") ? 1.55 : 1.0
         )
-
-        // ── Score + close-calls ────────────────────────────────────
-        for i in newObs.indices where !newObs[i].scored && useCase.hasPassed(newObs[i]) {
-            newObs[i].scored = true
-            let mult = scoreMultiplier
-            score.current += 1 * mult
-
-            if useCase.isCloseCall(absY: y, o: newObs[i], bonusFactor: hasDaredevil ? 0.25 : 0) {
-                combo         += 1
-                score.current += useCase.closeCallScoreBonus * mult
-                blinkMeter      = min(1, blinkMeter + useCase.closeCallBlinkBonus)
-                addPopup(String(localized: "CLOSE CALL +BLINK"), x: world.charX, y: y - 30, kind: .closeCall)
-            } else {
-                combo = 0
+        for i in pickups.indices where collected.contains(pickups[i].id) {
+            pickups[i].collected = true
+            switch pickups[i].kind {
+            case .coin:
+                score.coinsEarned += 1
+            case .heart:
+                hearts = min(3, hearts + 1)
+                showBanner("Heart recovered", accent: .red, duration: 1.1)
             }
         }
+        pickups.removeAll { $0.collected }
 
-        // ── Eye Beam projectiles (before collision) ────────────────
-        var newProj     = useCase.moveProjectiles(projectiles, sdt: sdt)
-        var consumed    = Set<UUID>()
-        var obsToRemove = IndexSet()
-        for proj in newProj where !consumed.contains(proj.id) {
-            for i in newObs.indices where !obsToRemove.contains(i) {
-                if useCase.collidesWithProjectile(proj, obstacle: newObs[i]) {
-                    addExplosion(x: newObs[i].x + world.obstacleWidth / 2,
-                                 y: newObs[i].gapY + newObs[i].gapH / 2)
-                    obsToRemove.insert(i)
-                    consumed.insert(proj.id)
-                    break
-                }
-            }
-        }
-        newObs.remove(atOffsets: obsToRemove)
-        newProj    = newProj.filter { !consumed.contains($0.id) }
-        projectiles = newProj
-
-        // ── Collision ──────────────────────────────────────────────
-        for o in newObs where useCase.collides(absY: y, with: o) { die(); return }
-
-        obstacles = newObs
-
-        // ── Pickups ────────────────────────────────────────────────
-        var newPickups = useCase.movePickups(pickups, sdt: moveSdt)
-        for i in newPickups.indices where !newPickups[i].collected {
-            if useCase.collidesWithPickup(absY: y, pickup: newPickups[i], magnetBonus: hasCoinMagnet ? 22 : 0) {
-                newPickups[i].collected = true
-                switch newPickups[i].kind {
-                case .coin:
-                    score.coinsEarned += 1
-                    addPopup("+1", x: newPickups[i].x, y: newPickups[i].y - 16, kind: .coin)
-                case .shield:
-                    shielded       = true
-                    shieldHitsLeft = shieldMaxHits
-                    addPopup(String(localized: "SHIELD!"), x: newPickups[i].x, y: newPickups[i].y - 20, kind: .shield)
-                }
-            }
-        }
-        pickups = newPickups.filter { !$0.collected }
-
-        // ── Danger feedback ────────────────────────────────────────
-        dangerLevel = useCase.dangerLevel(absY: y, obstacles: newObs)
-
-        // ── Primary spawn ──────────────────────────────────────────
-        spawnTimer -= Double(moveSdt)
-        if spawnTimer <= 0 {
-            spawnCount += 1
-            spawnOne()
-            spawnTimer = useCase.spawnInterval(score: score.current)
-
-            if spawnCount % 4 == 0 {
-                pendingDoubleSecs = useCase.spawnInterval(score: score.current) * 0.45
-            }
+        // ── Finish line ──────────────────────────────────────────────
+        if useCase.reachedFinish(player: p, finishX: finishX) {
+            winLevel()
         }
 
-        // ── Pending double spawn ───────────────────────────────────
-        if pendingDoubleSecs > 0 {
-            pendingDoubleSecs -= Double(moveSdt)
-            if pendingDoubleSecs <= 0 {
-                pendingDoubleSecs = 0
-                spawnOne()
-            }
-        }
-
-        // ── Cleanup timed effects ──────────────────────────────────
+        // ── Cleanup ──────────────────────────────────────────────────
         let now = Date()
-        popups = popups.filter { now.timeIntervalSince($0.born) < 0.9 }
-        rings  = rings.filter  { now.timeIntervalSince($0.born) < 0.45 }
+        rings = rings.filter { now.timeIntervalSince($0.born) < 0.45 }
+
+        player = p
     }
 
     // MARK: - Helpers
 
-    private func spawnOne() {
-        let (obs, newPickups) = useCase.spawnObstacle(score: score.current)
-        obstacles.append(obs)
-        pickups.append(contentsOf: newPickups)
-    }
+    private func takeDamage(player p: inout PlayerState, respawn: Bool) {
+        guard !p.isInvincible else { return }
 
-    private func doFlap() {
-        ollie.vy        = useCase.jumpVelocityValue()
-        ollie.wingPhase += .pi
-        spawnRing()
-    }
-
-    private func fireBeam() {
-        beamCharge = 0
-        let proj   = ProjectileModel(x: world.charX + world.charSize, y: absY)
-        projectiles.append(proj)
-        addPopup(String(localized: "EYE BEAM!"), x: world.charX, y: absY - 50, kind: .beam)
-        spawnRing()
-    }
-
-    private func addExplosion(x: CGFloat, y: CGFloat) {
-        for offset: CGFloat in [-30, 0, 30] {
-            let ring = RingModel(x: x, y: y + offset)
-            rings.append(ring)
-            let rid = ring.id
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                self.rings.removeAll { $0.id == rid }
-            }
-        }
-        score.current += 2 * scoreMultiplier
-        addPopup(String(format: String(localized: "SMASH! +%lld"), 2 * scoreMultiplier), x: x - 30, y: y - 44, kind: .beam)
-    }
-
-    private func die() {
-        if shielded {
-            shieldHitsLeft -= 1
-            if shieldHitsLeft > 0 {
-                flashActive = true
-                addPopup(String(localized: "SHIELD HIT"), x: world.charX, y: absY - 30, kind: .shield)
-            } else {
-                shielded    = false
-                flashActive = true
-                addPopup(String(localized: "SHIELD BREAK"), x: world.charX, y: absY - 30, kind: .shield)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { self.flashActive = false }
+        if shieldCharges > 0 {
+            shieldCharges -= 1
+            p = useCase.applyInvincibility(p)
+            flashActive = true
+            showBanner("Shield absorbed the hit", accent: .ollie_sky, duration: 1.0)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { self.flashActive = false }
             return
         }
-        phase = .dead
+
+        hearts -= 1
         flashActive = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) { self.flashActive = false }
-        if score.current > score.best {
-            score.best = score.current
-            scoreRepo.saveBestScore(score.current)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { self.flashActive = false }
+
+        if hearts <= 0 {
+            phase = .dead
+            return
         }
+
+        p = useCase.applyInvincibility(p)
+        if respawn {
+            p.worldX  = p.checkpointWorldX
+            p.screenY = p.checkpointScreenY
+            p.vy      = 0
+            p.isOnGround = true
+            p.extraJumpsRemaining = 1
+        }
+    }
+
+    private func winLevel() {
+        phase = .levelComplete
         score.coins += score.coinsEarned
         scoreRepo.saveCoins(score.coins)
-        updateStreak()
-    }
-
-    private func updateStreak() {
-        let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd"
-        let today = df.string(from: Date())
-        let last  = scoreRepo.getLastPlayedDate()
-
-        if let last {
-            let yesterday = df.string(
-                from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-            )
-            if last == today {
-                // already counted today
-            } else if last == yesterday {
-                streak += 1
-            } else {
-                streak = 1
-            }
-        } else {
-            streak = 1
+        if arenaId + 1 > highestArena && arenaId < 7 {
+            highestArena = arenaId + 1
+            scoreRepo.saveHighestArenaUnlocked(highestArena)
         }
-        scoreRepo.saveStreak(streak)
-        scoreRepo.saveLastPlayedDate(today)
     }
 
-    private func spawnRing() {
-        let ring = RingModel(x: world.charX + world.charSize / 2, y: absY)
-        rings.append(ring)
-        let rid = ring.id
+    private func spawnRingAt(_ y: CGFloat) {
+        let r = RingModel(x: world.charScreenX, y: y)
+        rings.append(r)
+        let rid = r.id
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
             self.rings.removeAll { $0.id == rid }
         }
     }
 
-    private func addPopup(_ text: String, x: CGFloat, y: CGFloat, kind: PopupModel.Kind) {
-        let p = PopupModel(text: text, x: x, y: y, kind: kind)
-        popups.append(p)
-        let pid = p.id
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-            self.popups.removeAll { $0.id == pid }
+    private func startingShieldCharges() -> Int {
+        if inventory.activeUpgrades.contains("pw_rookie") { return 2 }
+        if inventory.activeUpgrades.contains("pw_iron") { return 1 }
+        return 0
+    }
+
+    private func showBanner(_ text: String, accent: Color, duration: TimeInterval = 1.4) {
+        bannerText = text
+        bannerAccent = accent
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+            if self.bannerText == text {
+                self.bannerText = nil
+            }
         }
     }
 }

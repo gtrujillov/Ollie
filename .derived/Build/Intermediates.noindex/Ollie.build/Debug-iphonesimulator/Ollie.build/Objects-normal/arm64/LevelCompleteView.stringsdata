@@ -1,0 +1,72 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Arena/LevelCompleteView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "ARENA CLEAR!",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "🏆 All arenas conquered!",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "COINS",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 56
+        }
+      },
+      {
+        "comment": "",
+        "key": "HEARTS",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ unlocked!",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "NEXT ARENA",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 90
+        }
+      },
+      {
+        "comment": "",
+        "key": "ARENAS",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "HOME",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 112
+        }
+      }
+    ]
+  },
+  "version": 1
+}

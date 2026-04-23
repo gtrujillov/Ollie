@@ -264,6 +264,8 @@ private struct MiniLashPreview: View {
     }
 }
 
-#Preview {
-    ShopView(onClose: {})
+struct ShopView_Previews: PreviewProvider {
+    static var previews: some View {
+        ShopView(onClose: {})
+    }
 }

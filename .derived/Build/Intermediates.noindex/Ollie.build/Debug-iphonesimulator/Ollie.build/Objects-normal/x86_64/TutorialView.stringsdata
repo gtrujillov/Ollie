@@ -1,0 +1,24 @@
+{
+  "source": "/Users/gonzalotrujillovallejo/Documents/Personal/Ollie/Ollie/Presentation/Views/Tutorial/TutorialView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "NEXT",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "GOT IT",
+        "location": {
+          "startingColumn": 99,
+          "startingLine": 71
+        }
+      }
+    ]
+  },
+  "version": 1
+}

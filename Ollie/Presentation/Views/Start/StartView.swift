@@ -2,15 +2,31 @@ import SwiftUI
 
 struct StartView: View {
     @ObservedObject var viewModel: GameViewModel
-    let onPlay:  () -> Void
-    let onShop:  () -> Void
+    let onPlay:        () -> Void
+    let onArenaSelect: () -> Void
+    let onShop:        () -> Void
 
-    @State private var idlePhase: CGFloat = 0
+    @State private var idlePhase:  CGFloat = 0
     @State private var pulseScale: CGFloat = 1.0
+
+    private var currentArena: ArenaDefinition {
+        ArenaRegistry.arena(id: viewModel.highestArena)
+    }
 
     var body: some View {
         ZStack {
-            Color.ollie_cream.ignoresSafeArea()
+            LinearGradient(
+                colors: [currentArena.skyTop, currentArena.skyBottom, currentArena.bgColor],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            Circle()
+                .fill(currentArena.glowColor.opacity(0.25))
+                .frame(width: 280, height: 280)
+                .blur(radius: 18)
+                .offset(x: 120, y: -220)
 
             VStack(spacing: 0) {
                 topBar
@@ -25,99 +41,107 @@ struct StartView: View {
             withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
                 idlePhase = 1
             }
-            withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
+            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
                 pulseScale = 1.04
             }
         }
     }
 
-    // MARK: - Top Bar
+    // MARK: - Top bar
 
     private var topBar: some View {
         HStack {
-            if viewModel.streak > 1 {
-                HStack(spacing: 4) {
-                    Image(systemName: "flame.fill")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(Color(red: 0.9, green: 0.4, blue: 0.1))
-                    Text("\(viewModel.streak)")
-                        .font(.ollieBody(13, weight: .bold))
-                        .foregroundStyle(Color.ollie_ink)
-                        .monospacedDigit()
-                }
-                .padding(.vertical, 6)
-                .padding(.leading, 8)
-                .padding(.trailing, 12)
-                .background(Color.ollie_subtle, in: Capsule())
-                .transition(.scale.combined(with: .opacity))
+            // Current arena badge
+            HStack(spacing: 6) {
+                Image(systemName: currentArena.emojiName)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(currentArena.glowColor)
+                Text(currentArena.name.uppercased())
+                    .font(.ollieMono(10, weight: .bold))
+                    .foregroundStyle(Color.white)
+                    .tracking(1)
             }
+            .padding(.vertical, 6)
+            .padding(.leading, 8)
+            .padding(.trailing, 12)
+            .premiumPanel(tint: currentArena.accentColor.opacity(0.28), cornerRadius: 999, shadowOpacity: 0.10)
+
             Spacer()
-            HStack(spacing: 8) {
-                CoinView(size: 22)
+
+            HStack(spacing: 6) {
+                CoinView(size: 20)
                 Text("\(viewModel.score.coins)")
-                    .font(.ollieBody(15, weight: .bold))
-                    .foregroundStyle(Color.ollie_ink)
+                    .font(.ollieBody(14, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .monospacedDigit()
             }
             .padding(.vertical, 6)
             .padding(.leading, 8)
             .padding(.trailing, 12)
-            .background(Color.ollie_subtle, in: Capsule())
+            .premiumPanel(tint: currentArena.skyBottom.opacity(0.24), cornerRadius: 999, shadowOpacity: 0.10)
         }
         .padding(.top, 60)
-        .animation(.spring(duration: 0.4), value: viewModel.streak)
     }
 
     // MARK: - Hero
 
     private var heroArea: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: 24) {
             VStack(spacing: 4) {
                 Text("Ollie")
-                    .font(.ollieSerif(96))
-                    .foregroundStyle(Color.ollie_ink)
+                    .font(.ollieSerif(90))
+                    .foregroundStyle(Color.white)
                     .offset(y: idlePhase == 1 ? -10 : 0)
                     .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: idlePhase)
 
-                Text("TAP · HOLD · BLINK")
-                    .font(.ollieMono(11))
-                    .foregroundStyle(Color.ollie_muted)
-                    .tracking(3)
+                Text("WARRIOR")
+                    .font(.ollieMono(12))
+                    .foregroundStyle(currentArena.glowColor)
+                    .tracking(5)
             }
 
-            OllieCharacterView(
-                size:      140,
-                wingPhase: idlePhase * 2 * .pi
+            OllieWarriorView(
+                size:      130,
+                runPhase:  idlePhase * 3
             )
-            .offset(y: idlePhase == 1 ? -10 : 0)
+            .offset(y: idlePhase == 1 ? -8 : 0)
             .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: idlePhase)
 
-            statRow
+            arenaInfoCard
         }
     }
 
-    private var statRow: some View {
-        HStack(spacing: 10) {
-            statCard(label: "BEST", value: "\(viewModel.score.best)")
-            statCard(label: "COINS", value: "\(viewModel.score.coins)")
-        }
-    }
+    private var arenaInfoCard: some View {
+        Button(action: onArenaSelect) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(currentArena.accentColor.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: currentArena.emojiName)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(currentArena.accentColor)
+                }
 
-    private func statCard(label: LocalizedStringKey, value: String) -> some View {
-        VStack(spacing: 2) {
-            Text(label)
-                .font(.ollieMono(9))
-                .foregroundStyle(Color.ollie_muted)
-                .tracking(2)
-            Text(value)
-                .font(.ollieSerif(28))
-                .foregroundStyle(Color.ollie_ink)
-                .monospacedDigit()
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(currentArena.name.uppercased())
+                        .font(.ollieMono(11, weight: .bold))
+                        .foregroundStyle(Color.white)
+                        .tracking(1)
+                    Text(currentArena.description)
+                        .font(.ollieBody(11))
+                        .foregroundStyle(Color.white.opacity(0.72))
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Color.white.opacity(0.62))
+            }
+            .padding(14)
+            .premiumPanel(tint: currentArena.accentColor.opacity(0.24), cornerRadius: 18, shadowOpacity: 0.10)
         }
-        .frame(minWidth: 80)
-        .padding(.vertical, 10)
-        .padding(.horizontal, 14)
-        .background(Color.ollie_subtle, in: RoundedRectangle(cornerRadius: 14))
     }
 
     // MARK: - Bottom
@@ -125,7 +149,7 @@ struct StartView: View {
     private var bottomArea: some View {
         VStack(spacing: 12) {
             playButton
-            secondaryIcons
+            secondaryButtons
         }
         .padding(.bottom, 60)
     }
@@ -134,65 +158,53 @@ struct StartView: View {
         Button(action: onPlay) {
             HStack {
                 Spacer()
-                Text("FLAP TO START")
-                    .font(.ollieBody(20, weight: .bold))
+                Text("PLAY")
+                    .font(.ollieBody(22, weight: .bold))
                     .foregroundStyle(Color.ollie_paper)
-                    .tracking(1)
+                    .tracking(2)
                 Spacer()
-
                 ZStack {
                     Circle()
-                        .fill(Color.ollie_coral)
-                        .frame(width: 30, height: 30)
+                        .fill(currentArena.accentColor)
+                        .frame(width: 32, height: 32)
                     Image(systemName: "play.fill")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(Color.ollie_paper)
                 }
                 .padding(.trailing, 4)
             }
             .frame(height: 68)
-            .background(Color.ollie_ink, in: Capsule())
-            .shadow(color: Color.ollie_ink.opacity(0.22), radius: 10, x: 0, y: 6)
             .scaleEffect(pulseScale)
         }
+        .buttonStyle(PremiumCapsuleButtonStyle(fill: currentArena.accentColor, foreground: .white))
     }
 
-    private var secondaryIcons: some View {
+    private var secondaryButtons: some View {
         HStack(spacing: 10) {
+            Button(action: onArenaSelect) {
+                Label("ARENAS", systemImage: "map.fill")
+                    .font(.ollieBody(12, weight: .semibold))
+                    .foregroundStyle(Color.white)
+                    .tracking(1)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .premiumPanel(tint: currentArena.skyBottom.opacity(0.20), cornerRadius: 16, shadowOpacity: 0.08)
+            }
             Button(action: onShop) {
-                iconLabel("SHOP")
-            }
-            iconButton("RANKS")
-            iconButton("DAILY", badge: "2")
-        }
-    }
-
-    private func iconButton(_ label: LocalizedStringKey, badge: String? = nil) -> some View {
-        ZStack(alignment: .topTrailing) {
-            iconLabel(label)
-            if let badge {
-                Text(badge)
-                    .font(.ollieBody(11, weight: .bold))
-                    .foregroundStyle(Color.ollie_paper)
-                    .frame(minWidth: 20, minHeight: 20)
-                    .padding(.horizontal, 4)
-                    .background(Color.ollie_coral, in: Capsule())
-                    .offset(x: 4, y: -4)
+                Text("SHOP")
+                    .font(.ollieBody(12, weight: .semibold))
+                    .foregroundStyle(Color.white)
+                    .tracking(1.5)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .premiumPanel(tint: currentArena.skyBottom.opacity(0.20), cornerRadius: 16, shadowOpacity: 0.08)
             }
         }
-    }
-
-    private func iconLabel(_ label: LocalizedStringKey) -> some View {
-        Text(label)
-            .font(.ollieBody(12, weight: .semibold))
-            .foregroundStyle(Color.ollie_ink)
-            .tracking(1.5)
-            .frame(maxWidth: .infinity)
-            .frame(height: 48)
-            .background(Color.ollie_subtle, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
-#Preview {
-    StartView(viewModel: GameViewModel(), onPlay: {}, onShop: {})
+struct StartView_Previews: PreviewProvider {
+    static var previews: some View {
+        StartView(viewModel: GameViewModel(), onPlay: {}, onArenaSelect: {}, onShop: {})
+    }
 }

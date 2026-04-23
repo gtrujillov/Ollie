@@ -7,25 +7,28 @@ struct TutorialView: View {
 
     private let pages: [TutorialPage] = [
         TutorialPage(
-            icon:     "hand.tap.fill",
-            title:    "TAP & HOLD",
-            body:     "Tap anywhere on the left to flap. Hold to BLINK — time slows and Ollie glows.",
-            bodyES:   "Toca la izquierda para aletear. Mantén para PARPADEAR — el tiempo se ralentiza.",
-            accent:   Color.ollie_coral
+            icon:   "arrow.up.circle.fill",
+            title:  "JUMP",
+            body:   "Tap the LEFT side of the screen to make Ollie jump. Tap again in the air for a double jump!",
+            accent: Color(red: 0.35, green: 0.70, blue: 0.35)
         ),
         TutorialPage(
-            icon:     "bolt.fill",
-            title:    "EYE BEAM",
-            body:     "Wait for the ⚡ charge to fill, then tap the right side to unleash a beam that blasts obstacles.",
-            bodyES:   "Espera a que ⚡ se recargue y toca la derecha para disparar el rayo ocular.",
-            accent:   Color(red: 0.95, green: 0.80, blue: 0.10)
+            icon:   "bolt.fill",
+            title:  "ATTACK",
+            body:   "Tap the RIGHT side to swing your sword. Slash enemies to defeat them and earn coins.",
+            accent: Color(red: 0.88, green: 0.70, blue: 0.08)
         ),
         TutorialPage(
-            icon:     "target",
-            title:    "MISSIONS",
-            body:     "Each run gives you 3 missions. Complete them to earn bonus coins and unlock the shop.",
-            bodyES:   "Cada partida tiene 3 misiones. Complétalas para ganar monedas extra.",
-            accent:   Color(red: 0.2, green: 0.75, blue: 0.4)
+            icon:   "heart.fill",
+            title:  "3 HEARTS",
+            body:   "Ollie has 3 hearts. Taking damage costs one heart — reach a checkpoint to respawn there.",
+            accent: Color(red: 0.92, green: 0.22, blue: 0.22)
+        ),
+        TutorialPage(
+            icon:   "flag.fill",
+            title:  "REACH THE GOAL",
+            body:   "Run to the GOAL flag at the end of each arena. Clear it to unlock the next challenge!",
+            accent: Color(red: 0.45, green: 0.38, blue: 0.92)
         ),
     ]
 
@@ -46,7 +49,6 @@ struct TutorialView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .frame(height: 360)
 
-                // Dot indicators
                 HStack(spacing: 8) {
                     ForEach(pages.indices, id: \.self) { i in
                         Circle()
@@ -112,10 +114,11 @@ private struct TutorialPage {
     let icon:   String
     let title:  String
     let body:   String
-    let bodyES: String
     let accent: Color
 }
 
-#Preview {
-    TutorialView(onDismiss: {})
+struct TutorialView_Previews: PreviewProvider {
+    static var previews: some View {
+        TutorialView(onDismiss: {})
+    }
 }

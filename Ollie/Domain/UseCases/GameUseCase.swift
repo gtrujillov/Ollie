@@ -1,186 +1,320 @@
 import CoreGraphics
+import Foundation
+
+// MARK: - Platformer Physics Engine (pure, stateless)
 
 struct GameUseCase {
-    let world:      GameWorld
-    let difficulty: CGFloat   // 1.0 = normal
+    let world: GameWorld
 
-    // Base physics (difficulty-scaled, not score-scaled)
-    private var baseGravity:   CGFloat { world.height * 1.604 * difficulty }
-    private var jumpVelocity:  CGFloat { -world.height * 0.492 }
-    private var baseSpeed:     CGFloat { world.width  * 0.498 * difficulty }
-    private var baseGapH:      CGFloat { world.height * 210   / 874 }
-    private var baseSpawnInt:  Double  { 1.6 / Double(difficulty) }
+    // Physics constants
+    let gravity:       CGFloat = 2250
+    let jumpVelocity:  CGFloat = -1090
+    let runSpeed:      CGFloat = 280
+    let maxFallSpeed:  CGFloat = 1650
+    let attackDuration: CGFloat = 0.26
+    let invincibleDuration: CGFloat = 1.8
+    let swordReach:    CGFloat = 90
+    let coyoteTime:    CGFloat = 0.12
+    let jumpBufferTime: CGFloat = 0.12
 
-    // MARK: - Progressive difficulty (pure functions, ViewModel applies them)
+    // MARK: - Player physics
 
-    func speedMultiplier(score: Int) -> CGFloat {
-        // +7 % every 8 points, capped at 2.2×
-        min(1.0 + CGFloat(score / 8) * 0.07, 2.2)
-    }
+    func applyGravity(to p: PlayerState, dt: CGFloat) -> PlayerState {
+        var n = p
+        n.vy = min(n.vy + gravity * dt, maxFallSpeed)
+        n.screenY += n.vy * dt
+        n.runPhase += dt * 10  // running animation
+        n.worldX   += runSpeed * dt
+        n.coyoteTimer = n.isOnGround ? coyoteTime : max(0, n.coyoteTimer - dt)
+        n.jumpBufferTimer = max(0, n.jumpBufferTimer - dt)
 
-    func gapHeight(score: Int) -> CGFloat {
-        // shrinks every 6 points, floor at 60 % of base
-        let reduction = CGFloat(score / 6) * world.height * 0.008
-        return max(baseGapH - reduction, baseGapH * 0.60)
-    }
-
-    func spawnInterval(score: Int) -> Double {
-        // spawns accelerate with speed
-        baseSpawnInt / Double(speedMultiplier(score: score))
-    }
-
-    // MARK: - Blink / Dash tuning
-
-    let blinkDrainRate:      CGFloat = 0.45
-    let blinkRechargeRate:   CGFloat = 0.08
-    let blinkTimeScale:      CGFloat = 0.28
-    let closeCallBlinkBonus: CGFloat = 0.25
-    let closeCallScoreBonus: Int     = 3
-
-    let beamChargeRate: CGFloat = 1.0 / 7.0   // full charge in 7 real seconds
-    let beamSpeed:      CGFloat = 1800         // px/s
-
-    // MARK: - Physics
-
-    func jumpVelocityValue() -> CGFloat { jumpVelocity }
-
-    func applyPhysics(_ s: OlliePhysics, dt: CGFloat, timeScale: CGFloat) -> OlliePhysics {
-        let sdt = dt * timeScale
-        var n = s
-        n.vy        += baseGravity * sdt
-        n.y         += n.vy * sdt
-        n.rotation   = max(-30, min(70, n.vy * 0.08))
-        n.wingPhase += sdt * 12
+        // Timers
+        if n.attackTimer > 0 {
+            n.attackTimer -= dt
+            if n.attackTimer <= 0 {
+                n.attackTimer  = 0
+                n.isAttacking  = false
+            }
+        }
+        if n.invincibleTimer > 0 {
+            n.invincibleTimer -= dt
+            if n.invincibleTimer < 0 { n.invincibleTimer = 0 }
+        }
         return n
     }
 
-    // MARK: - Bounds & collision
+    func jump(_ p: PlayerState) -> PlayerState {
+        var n = p
 
-    func isOutOfBounds(absY: CGFloat) -> Bool {
-        absY > world.height - world.groundHeight - world.charSize / 2
-            || absY < world.ceilingHeight - world.charSize / 2
-    }
-
-    func collides(absY: CGFloat, with o: ObstacleModel) -> Bool {
-        let inX = o.x < world.charX + world.charSize * 0.7
-               && o.x + world.obstacleWidth > world.charX + world.charSize * 0.3
-        guard inX else { return false }
-        return absY < o.gapY + 8 || absY > o.gapY + o.gapH - 8
-    }
-
-    func hasPassed(_ o: ObstacleModel) -> Bool {
-        o.x + world.obstacleWidth < world.charX
-    }
-
-    func isCloseCall(absY: CGFloat, o: ObstacleModel, bonusFactor: CGFloat = 0) -> Bool {
-        let margin = min(absY - o.gapY, (o.gapY + o.gapH) - absY)
-        return margin < world.charSize * (0.43 + bonusFactor)
-    }
-
-    // 0–1 danger signal for visual feedback
-    func dangerLevel(absY: CGFloat, obstacles: [ObstacleModel]) -> CGFloat {
-        guard let near = obstacles.first(where: {
-            $0.x + world.obstacleWidth > world.charX - 10 &&
-            $0.x < world.charX + world.charSize
-        }) else { return 0 }
-        let margin = min(absY - near.gapY, (near.gapY + near.gapH) - absY)
-        return max(0, 1 - margin / (world.charSize * 1.8))
-    }
-
-    // MARK: - Movement
-
-    func moveObstacles(_ obstacles: [ObstacleModel], sdt: CGFloat) -> [ObstacleModel] {
-        obstacles.compactMap { o in
-            var m  = o
-            m.x   -= baseSpeed * sdt
-            return m.x > -100 ? m : nil
+        if p.isOnGround || p.coyoteTimer > 0 {
+            n.vy = jumpVelocity
+            n.isOnGround = false
+            n.coyoteTimer = 0
+            n.jumpBufferTimer = 0
+            n.extraJumpsRemaining = 1
+            return n
         }
+
+        if p.extraJumpsRemaining > 0 {
+            n.vy = jumpVelocity * 0.94
+            n.isOnGround = false
+            n.jumpBufferTimer = 0
+            n.extraJumpsRemaining -= 1
+            return n
+        }
+
+        n.jumpBufferTimer = jumpBufferTime
+        return n
     }
 
-    // Update gapY for oscillating obstacles
-    func updateOscillation(_ obstacles: [ObstacleModel], sdt: CGFloat) -> [ObstacleModel] {
-        let amplitude = world.height * 0.065
-        let minGY     = world.ceilingHeight + 22
-        return obstacles.map { o in
-            guard o.oscillating else { return o }
-            var m      = o
-            m.oscPhase += sdt * 2.0
-            let maxGY   = world.height - world.groundHeight - o.gapH - 22
-            m.gapY      = max(minGY, min(maxGY, o.baseGapY + sin(m.oscPhase) * amplitude))
+    func attack(_ p: PlayerState) -> PlayerState {
+        guard !p.isAttacking else { return p }
+        var n        = p
+        n.isAttacking = true
+        n.attackTimer = attackDuration
+        return n
+    }
+
+    func applyInvincibility(_ p: PlayerState) -> PlayerState {
+        var n = p
+        n.invincibleTimer = invincibleDuration
+        return n
+    }
+
+    // MARK: - Ground collision
+
+    func resolveGround(player p: PlayerState, groundSegs: [GroundSegment]) -> PlayerState {
+        var n = p
+        let groundY = world.groundY
+        let bottom  = n.screenY + world.charSize * 0.5
+
+        let onSeg = groundSegs.contains { seg in
+            n.worldX >= seg.startX && n.worldX <= seg.endX
+        }
+
+        if onSeg && bottom >= groundY && n.vy >= 0 {
+            n.screenY   = groundY - world.charSize * 0.5
+            n.vy        = 0
+            n.isOnGround = true
+            n.coyoteTimer = coyoteTime
+            n.extraJumpsRemaining = 1
+        } else if !onSeg {
+            n.isOnGround = false
+        }
+        return n
+    }
+
+    // MARK: - Platform collision
+
+    func resolvePlatforms(player p: PlayerState, platforms: [PlatformModel]) -> PlayerState {
+        var n = p
+        guard n.vy > 0 else {
+            // Still check if standing on a platform (prevent falling through)
+            for plat in platforms {
+                let platScreenY = world.screenY(norm: plat.normY)
+                let topOfPlat   = platScreenY
+                let pLeft       = world.charScreenX - world.charSize * 0.35
+                let pRight      = world.charScreenX + world.charSize * 0.35
+                let platLeft    = plat.currentWorldX - (n.worldX - world.charScreenX)
+                let platRight   = platLeft + plat.width
+
+                if pRight > platLeft && pLeft < platRight {
+                    let pBottom = n.screenY + world.charSize * 0.5
+                    if abs(pBottom - topOfPlat) < 4 {
+                        n.isOnGround = true
+                        return n
+                    }
+                }
+            }
+            return n
+        }
+
+        let prevBottom = n.screenY - n.vy * (1.0/60.0) + world.charSize * 0.5  // approximate prev pos
+        let currBottom = n.screenY + world.charSize * 0.5
+        let pLeft      = world.charScreenX - world.charSize * 0.35
+        let pRight     = world.charScreenX + world.charSize * 0.35
+
+        for plat in platforms {
+            let platScreenY = world.screenY(norm: plat.normY)
+            let topOfPlat   = platScreenY
+            let platLeft    = plat.currentWorldX - (n.worldX - world.charScreenX)
+            let platRight   = platLeft + plat.width
+
+            let overlapX = pRight > platLeft && pLeft < platRight
+            guard overlapX else { continue }
+
+            // Landing detection: was above, now at or below top
+            if prevBottom <= topOfPlat + 6 && currBottom >= topOfPlat - 2 {
+                n.screenY   = topOfPlat - world.charSize * 0.5
+                n.vy        = 0
+                n.isOnGround = true
+                n.coyoteTimer = coyoteTime
+                n.extraJumpsRemaining = 1
+                return n
+            }
+        }
+        return n
+    }
+
+    func consumeBufferedJumpIfPossible(_ p: PlayerState) -> PlayerState {
+        guard p.jumpBufferTimer > 0, p.isOnGround || p.coyoteTimer > 0 else { return p }
+        return jump(p)
+    }
+
+    // MARK: - Moving platform tick
+
+    func updateMovingPlatforms(_ platforms: [PlatformModel], dt: CGFloat) -> [PlatformModel] {
+        platforms.map { p in
+            guard p.isMoving else { return p }
+            var m         = p
+            m.movePhase  += dt * p.moveSpeed
             return m
         }
     }
 
-    func movePickups(_ pickups: [PickupModel], sdt: CGFloat) -> [PickupModel] {
-        pickups.compactMap { p in
-            var m  = p
-            m.x   -= baseSpeed * sdt
-            return !m.collected && m.x > -40 ? m : nil
-        }
-    }
+    // MARK: - Enemy AI
 
-    // MARK: - Spawning
-
-    func spawnObstacle(score: Int) -> (ObstacleModel, [PickupModel]) {
-        let gh    = gapHeight(score: score)
-        let minGY = world.ceilingHeight + 50
-        let maxGY = max(minGY + 1, world.height - world.groundHeight - gh - 100)
-        let gapY  = minGY + CGFloat.random(in: 0...(maxGY - minGY))
-
-        var obs = ObstacleModel(x: world.width + 40, gapY: gapY, gapH: gh)
-
-        // 30 % chance of oscillating obstacle (after score 5)
-        if score > 5 && CGFloat.random(in: 0...1) < 0.30 {
-            obs.oscillating = true
-            obs.oscPhase    = CGFloat.random(in: 0...(2 * .pi))
-        }
-
-        let pickups = spawnPickups(gapY: gapY, gapH: gh, baseX: world.width + 40)
-        return (obs, pickups)
-    }
-
-    private func spawnPickups(gapY: CGFloat, gapH: CGFloat, baseX: CGFloat) -> [PickupModel] {
-        let cx = baseX + world.obstacleWidth / 2 - 11
-        let cy = gapY  + gapH / 2
-
-        let roll = CGFloat.random(in: 0...1)
-        if roll < 0.07 {
-            // Shield (rare)
-            return [PickupModel(x: cx, y: cy, kind: .shield)]
-        } else if roll < 0.28 {
-            // Arc of 5 coins through the gap
-            return (0..<5).map { j in
-                let t: CGFloat = CGFloat(j) / 4.0
-                let px = cx - 40 + CGFloat(j) * 20
-                let py = cy + sin(t * .pi) * (gapH * 0.22)
-                return PickupModel(x: px, y: py, kind: .coin)
+    func updateEnemies(_ enemies: [EnemyModel], dt: CGFloat) -> [EnemyModel] {
+        enemies.map { e in
+            var m = e
+            if m.isDead {
+                m.deathTimer += dt
+                return m
             }
-        } else if roll < 0.68 {
-            // Single coin
-            return [PickupModel(x: cx, y: cy, kind: .coin)]
-        }
-        return []
-    }
-
-    // MARK: - Projectile (Eye Beam)
-
-    func moveProjectiles(_ projectiles: [ProjectileModel], sdt: CGFloat) -> [ProjectileModel] {
-        projectiles.compactMap { p in
-            var m = p
-            m.x += beamSpeed * sdt
-            return m.x < world.width + 80 ? m : nil
+            switch m.type {
+            case .walker:
+                m.worldX += m.velocityX * dt
+                if m.worldX >= m.patrolRight  { m.velocityX = -abs(m.velocityX) }
+                if m.worldX <= m.patrolLeft   { m.velocityX =  abs(m.velocityX) }
+            case .cannon:
+                m.fireTimer += dt
+            }
+            return m
         }
     }
 
-    func collidesWithProjectile(_ proj: ProjectileModel, obstacle: ObstacleModel) -> Bool {
-        proj.x >= obstacle.x - 10 && proj.x <= obstacle.x + world.obstacleWidth + 10
+    func spawnFireballs(from enemies: [EnemyModel]) -> [FireballModel] {
+        enemies.compactMap { e in
+            guard e.type == .cannon && !e.isDead && e.fireTimer >= e.fireInterval else { return nil }
+            return FireballModel(worldX: e.worldX - 20, screenY: world.screenY(norm: e.normY) - world.charSize * 0.2)
+        }
     }
 
-    // MARK: - Pickup collision
+    func consumeFireballTimers(_ enemies: [EnemyModel]) -> [EnemyModel] {
+        enemies.map { e in
+            guard e.type == .cannon && !e.isDead && e.fireTimer >= e.fireInterval else { return e }
+            var m = e
+            m.fireTimer = 0
+            return m
+        }
+    }
 
-    func collidesWithPickup(absY: CGFloat, pickup: PickupModel, magnetBonus: CGFloat = 0) -> Bool {
-        let dx = (pickup.x + 11) - (world.charX + world.charSize / 2)
-        let dy = pickup.y - absY
-        return sqrt(dx * dx + dy * dy) < world.charSize / 2 + 14 + magnetBonus
+    func moveFireballs(_ fireballs: [FireballModel], dt: CGFloat, cameraX: CGFloat) -> [FireballModel] {
+        fireballs.compactMap { f in
+            var m = f
+            m.worldX -= f.speed * dt
+            // Remove if far off-screen left or out of bounds
+            let screenX = m.worldX - cameraX
+            return (screenX > -120 && m.worldX > 0) ? m : nil
+        }
+    }
+
+    // MARK: - Collision detection
+
+    /// Returns true if player is hit by a walking enemy
+    func playerHitByEnemy(player p: PlayerState, enemies: [EnemyModel]) -> Bool {
+        guard !p.isInvincible else { return false }
+        let pr = world.charSize * 0.42
+        for e in enemies where !e.isDead && e.type == .walker {
+            let screenX = e.worldX - (p.worldX - world.charScreenX)
+            let es = world.charSize * 0.45
+            let dx = abs(screenX - world.charScreenX)
+            let dy = abs(world.screenY(norm: e.normY) - p.screenY)
+            if dx < pr + es && dy < pr + es { return true }
+        }
+        return false
+    }
+
+    /// Returns true if player is hit by a fireball
+    func playerHitByFireball(player p: PlayerState, fireballs: [FireballModel]) -> Bool {
+        guard !p.isInvincible else { return false }
+        let pr = world.charSize * 0.40
+        let fr: CGFloat = 14
+        for f in fireballs {
+            let screenX = f.worldX - (p.worldX - world.charScreenX)
+            let dx = abs(screenX - world.charScreenX)
+            let dy = abs(f.screenY - p.screenY)
+            if dx < pr + fr && dy < pr + fr { return true }
+        }
+        return false
+    }
+
+    /// Returns IDs of enemies killed by sword
+    func enemiesKilledBySword(player p: PlayerState, enemies: [EnemyModel]) -> Set<UUID> {
+        guard p.isAttacking else { return [] }
+        let swordLeft  = world.charScreenX + world.charSize * 0.38
+        let swordRight = swordLeft + swordReach
+        let swordTop   = p.screenY - world.charSize * 0.32
+        let swordBottom = p.screenY + world.charSize * 0.32
+        var killed = Set<UUID>()
+        for e in enemies where !e.isDead {
+            let screenX = e.worldX - (p.worldX - world.charScreenX)
+            let es = world.charSize * 0.45
+            let eLeft  = screenX - es
+            let eRight = screenX + es
+            let eTop   = world.screenY(norm: e.normY) - es
+            let eBottom = world.screenY(norm: e.normY) + es
+            let overlapX = eRight > swordLeft && eLeft < swordRight
+            let overlapY = eBottom > swordTop && eTop < swordBottom
+            if overlapX && overlapY { killed.insert(e.id) }
+        }
+        return killed
+    }
+
+    /// Returns IDs of fireballs killed by sword
+    func fireballsDeflectedBySword(player p: PlayerState, fireballs: [FireballModel]) -> Set<UUID> {
+        guard p.isAttacking else { return [] }
+        let swordLeft   = world.charScreenX + world.charSize * 0.38
+        let swordRight  = swordLeft + swordReach
+        let swordTop    = p.screenY - world.charSize * 0.32
+        let swordBottom = p.screenY + world.charSize * 0.32
+        var deflected = Set<UUID>()
+        for f in fireballs {
+            let screenX = f.worldX - (p.worldX - world.charScreenX)
+            if screenX > swordLeft && screenX < swordRight &&
+               f.screenY > swordTop && f.screenY < swordBottom {
+                deflected.insert(f.id)
+            }
+        }
+        return deflected
+    }
+
+    /// Returns IDs of pickups collected
+    func collectPickups(player p: PlayerState, pickups: [PickupModel], radiusMultiplier: CGFloat = 1.0) -> Set<UUID> {
+        let pr: CGFloat = world.charSize * 0.55 * radiusMultiplier
+        var collected = Set<UUID>()
+        for pickup in pickups where !pickup.collected {
+            let screenX = pickup.worldX - (p.worldX - world.charScreenX)
+            let screenY = world.screenY(norm: pickup.normY)
+            let dx = abs(screenX - world.charScreenX)
+            let dy = abs(screenY - p.screenY)
+            if dx < pr && dy < pr { collected.insert(pickup.id) }
+        }
+        return collected
+    }
+
+    /// Returns true if player reached the finish line
+    func reachedFinish(player p: PlayerState, finishX: CGFloat) -> Bool {
+        p.worldX >= finishX
+    }
+
+    /// Returns true if player fell off the map
+    func playerFellOff(player p: PlayerState) -> Bool {
+        p.screenY > world.height + 80
+    }
+
+    /// Returns updated checkpoint world X if player passed a new one
+    func checkpointPassed(player p: PlayerState, checkpoints: [CGFloat]) -> CGFloat? {
+        checkpoints.last { cp in cp <= p.worldX && cp > p.checkpointWorldX }
     }
 }

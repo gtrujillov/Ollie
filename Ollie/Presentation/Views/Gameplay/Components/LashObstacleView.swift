@@ -17,11 +17,8 @@ struct LashObstacleView: View {
         .allowsHitTesting(false)
     }
 
-    // MARK: - Pillars
-
     private func drawTopPillar(_ ctx: inout GraphicsContext, w: CGFloat) {
         guard gapY > 0 else { return }
-
         let rect = CGRect(x: 0, y: 0, width: w, height: gapY)
         let path = Path(
             UIBezierPath(
@@ -37,7 +34,6 @@ struct LashObstacleView: View {
     private func drawBottomPillar(_ ctx: inout GraphicsContext, w: CGFloat, h: CGFloat) {
         let botY = gapY + gapH
         guard botY < h else { return }
-
         let rect = CGRect(x: 0, y: botY, width: w, height: h - botY)
         let path = Path(
             UIBezierPath(
@@ -49,8 +45,6 @@ struct LashObstacleView: View {
         ctx.fill(path, with: .color(color))
         drawStrands(&ctx, atY: botY, direction: .up, w: w)
     }
-
-    // MARK: - Lash Strands
 
     private enum StrandDirection { case up, down }
 
